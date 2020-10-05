@@ -60,9 +60,11 @@ pp = pp %>% group_by(district) %>% summarise(Population = sum(Population))
 pp$type<-"HC"
 pp$source<-"OCHA pre-war settlement list"
 
-# fix empty entries of population with estimate family*6=individuals
+#fix empty entries of population with estimate family*6=individuals
 na_index<-which(is.na(pop_idp$number_individuals))
 pop_idp$number_individuals[na_index]<- pop_idp$number_families[na_index]*6
+
+#reformat IDP population data into new data frame
 pp_idp = pop_idp %>% select(district,number_individuals)
 pp_idp = pp_idp %>% group_by(district) %>% summarise(number_individuals = sum(number_individuals))
 pp_idp$number_individuals<-round(pp_idp$number_individuals)
@@ -71,25 +73,26 @@ pp_idp$type<-"IDP"
 pp_idp$source<-"DSA IDP Site Master List 2019"
 
 
-#check which districts for IPD are over 30 surveys
+#check which districts for IPD are over 30 surveys and not covered by DSA 2019
 dis_idp[which(!(dis_idp %in% pop_idp_dis))]
-length(df$hh_size[df$district=="balcad" & df$idp_settlement=="IDP Site"])
-#need: baki, balcad
+length(df$hh_size[df$district=="baki" & df$idp_settlement=="IDP Site"])
+#need: baki
 
 pop_idp2$Population[pop_idp2$district=="baki"]
 #"8.388"
-#add baki
+#add baki from DSA 2020 to IDP population data 
 pp_idp[nrow(pp_idp) + 1,1] = "baki"
 pp_idp[nrow(pp_idp),2] = 8388
 pp_idp[nrow(pp_idp),3] = "IDP"
 pp_idp[nrow(pp_idp),4] = "DSA IDP Site Master List 2020"
 
-pop_all <- rbind(pp, pp_idp)
 
+#export patched population to document it
+pop_all <- rbind(pp, pp_idp)
 write_xlsx(pop_all, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/population_patching_for_weigthing",today,".xlsx"))
 
-#total_pop<- 12327536 #total population from HNO reference population OCHA estimation 2013-2014 UNFPA
 
+#start the weighting
 
 total_surv<-dim(df)[1]
 total_pop<-(sum(pp$Population[which(pp$district %in% dis)])+ sum(pp_idp$Population[which(pp_idp$district %in% dis_idp)]))
