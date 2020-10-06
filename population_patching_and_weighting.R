@@ -93,7 +93,6 @@ write_xlsx(pop_all, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutp
 
 
 #start the weighting
-
 total_surv<-dim(df)[1]
 total_pop<-(sum(pp$Population[which(pp$district %in% dis)])+ sum(pp_idp$Population[which(pp_idp$district %in% dis_idp)]))
 
@@ -118,3 +117,18 @@ for (i in 1:length(pp$district))
 
 write.csv(df, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.csv"), row.names=FALSE)
 write_xlsx(df, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.xlsx"))
+
+#coverage
+cover = df %>% select(district,idp_settlement)  %>% count(district,idp_settlement )
+write_xlsx(cover, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"coverage.xlsx"))
+
+#add states variable for Tableau dashboard
+df$state<-0
+df$state[df$region=="bakool"|df$region=="bay"] <- "South West State"
+df$state[df$region=="awdal"|df$region=="sool"|df$region=="sanaag"|df$region=="togdheer"|df$region=="woqooyi_galbeed"] <- "Somaliland"
+df$state[df$region=="bari"|df$region=="nugaal"] <- "Puntland"
+df$state[df$region=="gedo"|df$region=="lower_juba"|df$region=="lower_shabelle"] <- "Jubaland"
+df$state[df$region=="hiraan"|df$region=="middle_shabelle"] <- "Hirshabelle"
+df$state[df$region=="galgaduud"|df$region=="mudug"] <- "Galmudug"
+df$state[df$region=="banadir"] <- "Banadir"
+
