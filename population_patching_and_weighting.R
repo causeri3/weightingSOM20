@@ -7,7 +7,10 @@ today <- Sys.Date()
 today<-format(today, format="_%Y_%b_%d")
 
 #import data set
-df <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/MyOutputs/_2020_Oct_05_clean_data4.csv", head=T, dec=".", sep=",")
+df2 <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_3_clean.csv", head=T, dec=".", sep=",")
+#remove funky added on 700k rows since last cleaning
+df2=df2[1:10222,]
+
 
 #import population data HC (OCHA pre-war settlement list)
 pop <-read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/PopulationNumbers/Population_per_settlement.csv", head=T, dec=".", sep=",")
@@ -86,11 +89,15 @@ pp_idp[nrow(pp_idp),2] = 8388
 pp_idp[nrow(pp_idp),3] = "IDP"
 pp_idp[nrow(pp_idp),4] = "DSA IDP Site Master List 2020"
 
-
+#########################################################################################################################################################################################
 #export patched population to document it
 pop_all <- rbind(pp, pp_idp)
 write_xlsx(pop_all, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/population_patching_for_weigthing",today,".xlsx"))
 
+#coverage
+cover = df %>% select(district,idp_settlement)  %>% count(district,idp_settlement )
+write_xlsx(cover, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"coverage.xlsx"))
+#########################################################################################################################################################################################
 
 #start the weighting
 total_surv<-dim(df)[1]
@@ -114,14 +121,6 @@ for (i in 1:length(pp$district))
   df$weights[index_hc]<-((pp$Population[i]/total_pop)/(length(df$hh_size[df$district==pp$district[i] & df$idp_settlement=="no"])/total_surv))
 }
 
-
-write.csv(df, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.csv"), row.names=FALSE)
-write_xlsx(df, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.xlsx"))
-
-#coverage
-cover = df %>% select(district,idp_settlement)  %>% count(district,idp_settlement )
-write_xlsx(cover, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"coverage.xlsx"))
-
 #add states variable for Tableau dashboard
 df$state<-0
 df$state[df$region=="bakool"|df$region=="bay"] <- "South West State"
@@ -131,4 +130,7 @@ df$state[df$region=="gedo"|df$region=="lower_juba"|df$region=="lower_shabelle"] 
 df$state[df$region=="hiraan"|df$region=="middle_shabelle"] <- "Hirshabelle"
 df$state[df$region=="galgaduud"|df$region=="mudug"] <- "Galmudug"
 df$state[df$region=="banadir"] <- "Banadir"
+
+write.csv(df, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.csv"), row.names=FALSE)
+write_xlsx(df, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.xlsx"))
 

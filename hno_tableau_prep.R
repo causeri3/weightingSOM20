@@ -22,20 +22,20 @@ df3<- df[-index,]
 write.csv(df3, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"reduced_hno_ind.csv"), row.names=FALSE)
 
 
-#joining in Tableau was so fun, so let's join in R and get rid of doublicated variables
+#joining in Tableau was such fun, so let's join in R and get rid of duplicated variables
 som <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/MyOutputs/_2020_Oct_07weighted_data.csv", head=T, dec=".", sep=",")
 
-
-which( colnames(df)=="Sev..score..Protection.child.separated.1" )
-which( colnames(df)=="Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities.1" )
-which( colnames(df)=="Sev.score..Access.to.a.sufficient.quantity.of.water.1" )
-which( colnames(df)=="Sev.score..Access.to.an.improved.water.source.1" )
-which( colnames(df)=="X..of.HHs.having.security.of.tenure.issues.1" )
-which( colnames(df)=="X..of.HHs.living.in.inadequate.shelter.conditions..1" )
-which( colnames(df)=="X..of.HHs.having.adequate.living.space.1" )
+###changed strategy### - display all indicators (for HNO and clusters)
+#which( colnames(df)=="Sev..score..Protection.child.separated.1" )
+#which( colnames(df)=="Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities.1" )
+#which( colnames(df)=="Sev.score..Access.to.a.sufficient.quantity.of.water.1" )
+#which( colnames(df)=="Sev.score..Access.to.an.improved.water.source.1" )
+#which( colnames(df)=="X..of.HHs.having.security.of.tenure.issues.1" )
+#which( colnames(df)=="X..of.HHs.living.in.inadequate.shelter.conditions..1" )
+#which( colnames(df)=="X..of.HHs.having.adequate.living.space.1" )
 
 #hno minus double variables
-df4<-df3[,-c(24,26,27,29,30,31,33)]
+#df4<-df3[,-c(24,26,27,29,30,31,33)]
 
 #take relevant informnation from data set (state, regions, weights etc)
 som2<-som[,c(1,9,10,11,998,999)]
