@@ -7,9 +7,9 @@ today <- Sys.Date()
 today<-format(today, format="_%Y_%b_%d")
 
 #import data set
-df2 <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_3_clean.csv", head=T, dec=".", sep=",")
+df <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/_2020_Oct_15cleaned_data.csv", head=T, dec=".", sep=",")
 #remove funky added on 700k rows since last cleaning
-df2=df2[1:10222,]
+#df2=df2[1:10222,]
 
 
 #import population data HC (OCHA pre-war settlement list)
@@ -130,6 +130,11 @@ df$state[df$region=="gedo"|df$region=="lower_juba"|df$region=="lower_shabelle"] 
 df$state[df$region=="hiraan"|df$region=="middle_shabelle"] <- "Hirshabelle"
 df$state[df$region=="galgaduud"|df$region=="mudug"] <- "Galmudug"
 df$state[df$region=="banadir"] <- "Banadir"
+
+
+#change Excel date structure to normal dates
+df$left_aoo<-as.Date(som$left_aoo-1, origin = '1900-01-01')
+df$arrived_current<-as.Date(som$arrived_current-1, origin = '1900-01-01')
 
 write.csv(df, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.csv"), row.names=FALSE)
 write_xlsx(df, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.xlsx"))
