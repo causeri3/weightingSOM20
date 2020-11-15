@@ -1,4 +1,3 @@
-
 library(dplyr)
 library(writexl)
 
@@ -7,9 +6,11 @@ today <- Sys.Date()
 today<-format(today, format="_%Y_%b_%d")
 
 #import data set
-df <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/_2020_Oct_15cleaned_data.csv", head=T, dec=".", sep=",")
+#df <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/_2020_Oct_15cleaned_data.csv", head=T, dec=".", sep=",")
+df <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",")
+#df2 <- read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/_2020_Oct_06weighted_data.csv", head=T, dec=".", sep=",")
 #remove funky added on 700k rows since last cleaning
-#df2=df2[1:10222,]
+#df=df[1:10222,]
 
 
 #import population data HC (OCHA pre-war settlement list)
@@ -97,6 +98,17 @@ write_xlsx(pop_all, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutp
 #coverage
 cover = df %>% select(district,idp_settlement)  %>% count(district,idp_settlement )
 write_xlsx(cover, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"coverage.xlsx"))
+
+#sampling frame
+cover$idp_settlement[cover$idp_settlement=="yes"]<-"IDP"
+cover$idp_settlement[cover$idp_settlement=="no"]<-"HC"
+colnames(cover)[2]<-"settlement_type"
+colnames(cover)[3]<-"n_surveys"
+colnames(pop_all)[3]<-"settlement_type"
+
+sf<-merge(cover, pop_all)
+
+write.csv(sf, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/hypegrammaR/input/sampling_frame.csv"), row.names=FALSE)
 #########################################################################################################################################################################################
 
 #start the weighting
@@ -121,7 +133,7 @@ for (i in 1:length(pp$district))
   df$weights[index_hc]<-((pp$Population[i]/total_pop)/(length(df$hh_size[df$district==pp$district[i] & df$idp_settlement=="no"])/total_surv))
 }
 
-#add states variable for Tableau dashboard
+#add states variable
 df$state<-0
 df$state[df$region=="bakool"|df$region=="bay"] <- "South West State"
 df$state[df$region=="awdal"|df$region=="sool"|df$region=="sanaag"|df$region=="togdheer"|df$region=="woqooyi_galbeed"] <- "Somaliland"
@@ -132,10 +144,22 @@ df$state[df$region=="galgaduud"|df$region=="mudug"] <- "Galmudug"
 df$state[df$region=="banadir"] <- "Banadir"
 
 
-#change Excel date structure to normal dates
-df$left_aoo<-as.Date(som$left_aoo-1, origin = '1900-01-01')
-df$arrived_current<-as.Date(som$arrived_current-1, origin = '1900-01-01')
+#change Excel date structure to normal dates (first time around)
+df$left_aoo<-as.Date(df$left_aoo-1, origin = '1900-01-01')
+df$arrived_current<-as.Date(df$arrived_current-1, origin = '1900-01-01')
+
+#after further cleaning done in Excel change dates back to being dates (following times)
+df$left_aoo<-as.Date(df$left_aoo, "%d/%m/%Y")
+df$arrived_current<-as.Date(df$arrived_current, "%d/%m/%Y")
 
 write.csv(df, file= paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.csv"), row.names=FALSE)
 write_xlsx(df, paste0("C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/",today,"weighted_data.xlsx"))
+
+
+############double check weights calculations in Tableau Dashboard###############
+
+library(lubridate)
+sum(df$weights[which(year(df$left_aoo) == 2019)])
+sum(df$weights[which(year(df$arrived_current) == 2019)])
+sum(df$weights[which(year(df$arrived_current) == 2014)])
 
