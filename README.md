@@ -1,2 +1,4 @@
 # weightingSOM20
-creating weights in order to visualize aggregated survey responses in Tableau
+For REACH Initiative, Joint Multi Cluster Needs Asessment (JMCNA) report, 2020 Somalia:
+- Calculate weights in order to visualise aggregated survey responses
+- Get sampling frame for analysis
